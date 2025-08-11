@@ -5,10 +5,10 @@ const router = Router();
 
 router.get('/', (req, res) => {
     const sql = `
-    SELECT pa.nombre AS paciente, pa.correo AS correo, med.medico AS medico, esp.especialidad AS especialidad, c.fecha AS fecha,
+    SELECT c.id_cita AS id_cita, pa.nombre AS paciente, pa.correo AS correo, med.medico AS medico, esp.especialidad AS especialidad, c.fecha AS fecha,
     c.hora AS hora, mo.motivo AS motivo, c.descripcion AS descripcion, ubi.ubicacion AS sede, pay.metodo AS metodo, sta.estado AS status
     FROM citas c
-    LEFT JOIN Pacientes pa ON pa.id_paciente = c.id_paciente
+    LEFT JOIN pacientes pa ON pa.id_paciente = c.id_paciente
     LEFT JOIN Medicos med ON med.id_medico = c.id_medico
     LEFT JOIN Especialidades esp ON esp.id_especialidad = c.id_especialidad
     LEFT JOIN Motivos mo ON mo.id_motivo = c.id_motivo

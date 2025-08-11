@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import connection from '../config/db.js';
-import { connect } from 'http2';
 
 const router = Router();
 

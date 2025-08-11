@@ -40,16 +40,32 @@ export function pacientes() {
     `;
     document.getElementById('btn-addUser').addEventListener('click', (e) => {
         e.preventDefault();
-        //Funcion para agregar usuario
-        agregarUsuario();
+        location.hash = 'admin/agregar';
     })
 
     //Función para agregar datos a la tabla, se hará mediante un fetch
     cargarPacientes();
 }
 
-function agregarUsuario() {
-    alert('Agregar usuario')
+export function agregarPaciente() {
+    let content = document.getElementById('admin-content');
+    content.innerHTML = ''
+    content.innerHTML = `
+    <form id="add-user-form">
+    <label for="nombre">Nombre:</label>
+    <input type="text" id="nombre" name="nombre" required />
+
+    <label for="correo">Correo:</label>
+    <input type="email" id="correo" name="correo" required />
+
+    <button type="submit">Agregar Usuario</button>
+    </form> 
+    `;
+    document.getElementById('add-user-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        alert("hola")
+    })
+
 }
 
 function cargarPacientes() {
@@ -82,7 +98,7 @@ function cargarPacientes() {
 export function medicos() {
     let content = document.getElementById('admin-content');
     content.innerHTML = ''
- 
+
     cargarMedicos();
 }
 
@@ -105,8 +121,116 @@ function cargarMedicos() {
             });
         })
         .catch(error => {
-            alert('Error al cargar los datos: ',error)
+            alert('Error al cargar los datos: ', error)
         });
+}
+
+// Citas
+
+export function citas() {
+    let content = document.getElementById('admin-content');
+    content.innerHTML = ''
+    content.innerHTML = `
+    <button id='btn-addAppt'>Agregar cita</button>
+    <table id="apptsTable">
+        <tr>
+            <th>ID</th>
+            <th>Paciente</th>
+            <th>Correo</th>
+            <th>Medico</th>
+            <th>Especialidad</th>
+            <th>Fecha</th>
+            <th>Hora</th>
+            <th>Motivo</th>
+            <th>Descripcion</th>
+            <th>Sede</th>
+            <th>Metodo de pago</th>
+            <th>Estado</th>
+            <th></th>
+        </tr>
+    </table>
+    `;
+    cargarCitas();
+}
+
+function cargarCitas() {
+    let content = document.getElementById('admin-content');
+    fetch('http://localhost:3000/appts')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error en la consulta del servidor');
+            }
+            return response.json();
+        })
+        .then(data => {
+            const table = document.getElementById('apptsTable');
+            data.forEach(i => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                <td>${i.id_cita}</td>
+                <td>${i.paciente}</td>
+                <td>${i.correo}</td>
+                <td>${i.medico}</td>
+                <td>${i.especialidad}</td>
+                <td>${i.fecha.split('T')[0]}</td>
+                <td>${i.hora}</td>
+                <td>${i.motivo}</td>
+                <td>${i.descripcion}</td>
+                <td>${i.sede}</td>
+                <td>${i.metodo}</td>
+                <td>${i.status}</td>
+                <td><button id=editAppt>Editar</button></td>
+                `
+                table.appendChild(row);
+            });
+        })
+}
+
+// Otra info
+export function otraInfo() {
+    let content = document.getElementById('admin-content');
+    content.innerHTML = `
+    <h2>Motivos de consulta: </h2>
+    <div id='otrainfo-motivos'></div>
+    <h2>Métodos de pago: </h2>
+    <div id='otrainfo-pay'></div>
+    <h2>Sedes: </h2>
+    <div id='otrainfo-sedes'></div>
+    `
+    cargarOtraInfo();
+}
+
+function cargarOtraInfo() {
+    fetch('http://localhost:3000/otrainfo')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error en la consulta');
+            }
+            return response.json();
+        })
+        .then(data => {
+            const motivos = document.getElementById('otrainfo-motivos');
+            const pay = document.getElementById('otrainfo-pay');
+            const sedes = document.getElementById('otrainfo-sedes');
+            data.motivos.forEach(element => {
+                const row = document.createElement('h3');
+                row.innerHTML = element.motivo;
+                motivos.appendChild(row)
+            });
+            data.pagos.forEach(element => {
+                const row = document.createElement('h3');
+                row.innerHTML = element.metodo;
+                pay.appendChild(row)
+            });
+            data.ubis.forEach(element => {
+                const row = document.createElement('h3');
+                row.innerHTML = element.ubicacion;
+                sedes.appendChild(row)
+            });
+        })
+        .catch(error => {
+            console.log('Error al traer la info: ', error)
+        })
 }
 
 // Cerrar sesión -----------------------------------------------------------------------------------------------------

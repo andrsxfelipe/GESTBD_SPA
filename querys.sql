@@ -5,14 +5,14 @@ CREATE DATABASE IF NOT EXISTS prueba1;
 USE prueba1;
 
 -- Crear las tablas
-CREATE TABLE Medicos( id_medico INT AUTO_INCREMENT PRIMARY KEY, medico VARCHAR(100) NOT NULL);
-CREATE TABLE Especialidades (id_especialidad INT AUTO_INCREMENT PRIMARY KEY, especialidad VARCHAR(100) NOT NULL);
-CREATE TABLE Pacientes (id_paciente INT AUTO_INCREMENT PRIMARY KEY, nombre VARCHAR(100), correo VARCHAR(150));
-CREATE TABLE Motivos (id_motivo INT AUTO_INCREMENT PRIMARY KEY, motivo VARCHAR(150));
-CREATE TABLE Estados_citas (id_estado INT AUTO_INCREMENT PRIMARY KEY, estado VARCHAR(100));
-CREATE TABLE Pagos(id_metodo INT AUTO_INCREMENT PRIMARY KEY, metodo VARCHAR(100));
-CREATE TABLE Ubicaciones (id_ubicacion INT AUTO_INCREMENT PRIMARY KEY, ubicacion VARCHAR(150));
-CREATE TABLE Medicos_especialidad (
+CREATE TABLE medicos( id_medico INT AUTO_INCREMENT PRIMARY KEY, medico VARCHAR(100) NOT NULL);
+CREATE TABLE especialidades (id_especialidad INT AUTO_INCREMENT PRIMARY KEY, especialidad VARCHAR(100) NOT NULL);
+CREATE TABLE pacientes (id_paciente INT AUTO_INCREMENT PRIMARY KEY, nombre VARCHAR(100), correo VARCHAR(150));
+CREATE TABLE motivos (id_motivo INT AUTO_INCREMENT PRIMARY KEY, motivo VARCHAR(150));
+CREATE TABLE estados_citas (id_estado INT AUTO_INCREMENT PRIMARY KEY, estado VARCHAR(100));
+CREATE TABLE pagos(id_metodo INT AUTO_INCREMENT PRIMARY KEY, metodo VARCHAR(100));
+CREATE TABLE ubicaciones (id_ubicacion INT AUTO_INCREMENT PRIMARY KEY, ubicacion VARCHAR(150));
+CREATE TABLE medicos_especialidad (
     id_medico INT NOT NULL,
     id_especialidad INT NOT NULL,
     PRIMARY KEY (id_medico, id_especialidad),
@@ -68,10 +68,32 @@ LOAD DATA INFILE 'C:/Users/Feli-/Desktop/temporales/crudclinic.csv'
 -- ERROR 1290 (HY000): The MySQL server is running with the --secure-file-priv option so it cannot execute this statement
 -- Este paso se hace desde dbeaver o js
 
+-- Reemplazar '_at_' por '@'
+UPDATE citas_raw
+SET correo_paciente = REPLACE(correo_paciente, '_at_', '@')
+WHERE correo_paciente LIKE '%_at_%';
+
+-- POner en minusculas
+UPDATE citas_raw SET correo_paciente = LOWER(correo_paciente)
+
+--Quitar tildes
+UPDATE citas_raw SET correo_paciente = REPLACE (
+    REPLACE(
+        REPLACE(
+            REPLACE(
+                REPLACE(correo_paciente,'á', 'a'),
+            'é','e'),
+        'í','i'),
+    'ó','o'),
+'ú','u');
+
 -- 3)
 -- Poblar las tablas básicas (sin fk)
-
+--Pacientes opcion 1
 INSERT INTO Pacientes (nombre, correo) SELECT DISTINCT LOWER(TRIM(nombre_paciente)), LOWER(TRIM(correo_paciente)) FROM citas_raw;
+-- PAcientes opcion 2
+INSERT INTO Pacientes (nombre,correo) SELECT MIN(TRIM(nombre_paciente)) AS nombre_paciente, TRIM(correo_paciente) AS correo_paciente FROM citas_raw GROUP BY TRIM(correo_paciente);
+
 INSERT INTO Medicos(medico) SELECT DISTINCT TRIM(medico) FROM citas_raw;
 INSERT INTO Especialidades (especialidad) SELECT DISTINCT TRIM(especialidad) FROM citas_raw;
 INSERT INTO Motivos(motivo) SELECT DISTINCT TRIM(motivo) FROM citas_raw;
@@ -86,7 +108,7 @@ INSERT INTO Medicos_especialidad (id_medico, id_especialidad)
     FROM citas_raw
     ) tmp
     JOIN Medicos m ON m.medico = tmp.medico
-    JOIN Especialidades E ON e.especialidad = tmp.especialidad;
+    JOIN Especialidades e ON e.especialidad = tmp.especialidad;
 
 -- Citas
 INSERT INTO Citas (id_paciente, id_medico, id_especialidad, fecha, hora, id_motivo, descripcion, id_ubicacion, id_metodo, id_estado)

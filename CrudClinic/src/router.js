@@ -1,4 +1,4 @@
-import { AdminView, home, pacientes, medicos, cerrarSesion, } from './views/admin.js';
+import { AdminView, home, pacientes, agregarPaciente,medicos, cerrarSesion, citas, otraInfo } from './views/admin.js';
 import { UserView, setupUser } from './views/user.js';
 
 export function admin() {
@@ -26,10 +26,13 @@ export function router() {
                 medicos();
                 break;
             case 'admin/citas':
-                contentadm.innerHTML = `<h2>Citas: </h2>`
+                citas();
                 break;
             case 'admin/otros':
-                contentadm.innerHTML = `<h2>Otra info: </h2>`
+                otraInfo();
+                break;
+            case 'admin/agregar':
+                agregarPaciente();
                 break;
             default:
                 contentadm.innerHTML = `<h1>404 - Página no encontrada</h1>`;

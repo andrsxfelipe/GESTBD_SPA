@@ -7,7 +7,7 @@ router.get('/', (req, res) => {
     const sql = `
         SELECT m.medico,
         GROUP_CONCAT(e.especialidad SEPARATOR ',') AS especialidades
-        FROM medicos_especialidad me
+        FROM Medicos_especialidad me
         LEFT JOIN Medicos m ON m.id_medico = me.id_medico
         LEFT JOIN Especialidades e ON e.id_especialidad = me.id_especialidad
         GROUP BY m.medico;

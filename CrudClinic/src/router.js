@@ -1,7 +1,9 @@
-import { AdminView, pacientes, home, cerrarSesion } from './views/admin.js';
+import { AdminView, home, pacientes, medicos, cerrarSesion, } from './views/admin.js';
 import { UserView, setupUser } from './views/user.js';
 
 export function admin() {
+    const app = document.getElementById('container')
+    app.innerHTML = AdminView()
 }
 
 export function router() {
@@ -9,8 +11,7 @@ export function router() {
     // TODO LO DEL ADMIN
     // Aquí se implementara un if para validar si la variable rol = 'admin', se le pasara como parametro a la funcion router
     if (true) {
-        const app = document.getElementById('container')
-        app.innerHTML = AdminView()
+
         const contentadm = document.getElementById('admin-content');
         const route = location.hash.slice(1);
         cerrarSesion();
@@ -22,7 +23,7 @@ export function router() {
                 pacientes();
                 break;
             case 'admin/medicos':
-                contentadm.innerHTML = `<h2>Medicos: </h2>`
+                medicos();
                 break;
             case 'admin/citas':
                 contentadm.innerHTML = `<h2>Citas: </h2>`
@@ -36,8 +37,8 @@ export function router() {
     } else if (false) { // Si es usuario
         pass;
     } else { // Si el rol es null, entonces habran dos casos: login y default, 
-    // el default mostratá un letrero grande que no tiene acceso, primero logeese
-        
+        // el default mostratá un letrero grande que no tiene acceso, primero logeese
+
     }
 
 }

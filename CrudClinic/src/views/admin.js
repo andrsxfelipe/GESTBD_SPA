@@ -15,7 +15,7 @@ export function AdminView() {
 
 // Home ---------------------------------------------------------------------------------------------------
 
-export function home(){
+export function home() {
     let content = document.getElementById('admin-content');
     content.innerHTML = ''
     content.innerHTML = `
@@ -34,6 +34,7 @@ export function pacientes() {
             <th>ID</th>
             <th>Paciente</th>
             <th>Correo electrónico</th>
+            <th></th>
         </tr>
     </table>  
     `;
@@ -47,19 +48,65 @@ export function pacientes() {
     cargarPacientes();
 }
 
-function agregarUsuario(){
+function agregarUsuario() {
     alert('Agregar usuario')
 }
 
-function cargarPacientes(){
-    const table = document.getElementById('patientsTable');
-    const row = document.createElement('tr');
-    row.innerHTML = `
-    <td>1</td>
-    <td>Andres Londono</td>
-    <td>aflondonol@eafit.edu.co</td>
-    `;
-    table.appendChild(row);
+function cargarPacientes() {
+    fetch('http://localhost:3000/patients')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error en la consulta al servidor');
+            }
+            return response.json();
+        })
+        .then(data => {
+            const table = document.getElementById('patientsTable');
+            data.forEach(element => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                <td>${element.id_paciente}</td>
+                <td>${element.nombre}</td>
+                <td>${element.correo}</td>
+                <td><button id=editPatient>Editar</button></td>
+                `;
+                table.appendChild(row);
+            });
+        })
+        .catch(error => {
+            alert('Error al cargar los datos: ', error)
+        });
+}
+
+// Ventana Medicos ----------------------------------------------------------------------------------------------------------
+export function medicos() {
+    let content = document.getElementById('admin-content');
+    content.innerHTML = ''
+ 
+    cargarMedicos();
+}
+
+function cargarMedicos() {
+    let content = document.getElementById('admin-content');
+    fetch('http://localhost:3000/medicos')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error en la consulta del servidor');
+            }
+            return response.json();
+        })
+        .then(data => {
+            data.forEach(element => {
+                content.innerHTML += `
+                <h2>Medico: </h2>
+                <h3>${element.medico}</h3>
+                <h3>Especialidades: ${element.especialidades}</h3>
+                `
+            });
+        })
+        .catch(error => {
+            alert('Error al cargar los datos: ',error)
+        });
 }
 
 // Cerrar sesión -----------------------------------------------------------------------------------------------------

@@ -2,7 +2,7 @@ import { router,admin } from './router.js';
 
 
 if (true) { // Si es admin
-    // Logica para obtener el rol
+    admin();
     location.hash = 'admin';
 } // Si es user
 // Si no esta logeado (mandara a login), el rol será null
